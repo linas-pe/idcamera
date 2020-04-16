@@ -2,7 +2,6 @@ package cn.justforfun.views
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,7 @@ class CropImageView : FrameLayout {
         val inflater: LayoutInflater = LayoutInflater.from(context)
         val v: View = inflater.inflate(R.layout.crop_image_view, this, true)
         _imageView = v.findViewById(R.id.img_crop)
-        _cropOverlayView = v.findViewById<CropOverlayView>(R.id.overlay_crop)
+        _cropOverlayView = v.findViewById(R.id.overlay_crop)
     }
 
     fun setImageBitmap(bitmap: Bitmap) {

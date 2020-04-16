@@ -8,10 +8,6 @@ class CameraUtils {
     companion object {
         private var camera: Camera? = null
 
-        fun hasCamera(context: Context): Boolean {
-            return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-        }
-
         fun openCamera(): Camera? {
             camera = null
             camera = Camera.open()

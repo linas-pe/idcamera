@@ -1,25 +1,11 @@
 package cn.justforfun.utils
 
-import android.content.Context
-import android.content.ContextWrapper
-import android.os.Environment
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
 
 class FileUtils {
     companion object {
-        fun sdCardIsAvailable(): Boolean {
-            if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
-                return File(Environment.getExternalStorageDirectory().path).canWrite()
-            }
-            return false
-        }
-
-        fun createOrExistsDir(dirPath: String): Boolean {
-            return createOrExistsDir(getFileByPath(dirPath))
-        }
-
         fun createOrExistsDir(file: File?): Boolean {
             if (file == null) {
                 return false
@@ -27,12 +13,11 @@ class FileUtils {
 
             if (file.exists())
                 return file.isDirectory
-            try {
+            return try {
                 file.mkdirs()
-                return true
             } catch (e: SecurityException) {
                 e.printStackTrace()
-                return false
+                false
             }
         }
 
@@ -50,10 +35,15 @@ class FileUtils {
             if (!createOrExistsDir(file.parentFile)) {
                 return false
             }
-            return file.createNewFile()
+            try {
+                return file.createNewFile()
+            } catch (e: RuntimeException) {
+                e.printStackTrace()
+                return false
+            }
         }
 
-        fun getFileByPath(filePath: String): File? {
+        private fun getFileByPath(filePath: String): File? {
             return if (isSpace(filePath)) null else File(filePath)
         }
 

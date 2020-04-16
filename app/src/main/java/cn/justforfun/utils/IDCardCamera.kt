@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.fragment.app.Fragment
 import cn.justforfun.idcard.CameraActivity
+import java.lang.RuntimeException
 import java.lang.ref.WeakReference
 
 class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?) {
@@ -16,18 +17,18 @@ class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?)
         const val RESULT_CODE = 0X11
         const val PERMISSION_CODE_FIRST = 0x12
         const val TAKE_TYPE = "take_type"
-        const val IMAGE_PATH = "image_path"
+        const val IMAGE_NAME = "image_name"
 
         fun create(activity: Activity): IDCardCamera {
             return IDCardCamera(activity)
         }
 
-        fun create(fragment: Fragment): IDCardCamera {
-            return IDCardCamera(fragment)
-        }
-
-        fun getImagePath(data: Intent): String? {
-            return data.getStringExtra(IMAGE_PATH)
+        fun getImageName(type: Int): String {
+            when (type) {
+                TYPE_IDCARD_BACK -> return "temp_idcard_back.jpg"
+                TYPE_IDCARD_FRONT -> return "temp_idcard_back.jpg"
+            }
+            throw RuntimeException("unknown type")
         }
     }
 
@@ -37,7 +38,6 @@ class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?)
     }
 
     private constructor(activity: Activity) : this(activity, null)
-    private constructor(fragment: Fragment) : this(null, fragment)
 
     fun openCamera(IDCardDirection: Int) {
         val activity: Activity? = this._activity.get()

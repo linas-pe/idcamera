@@ -6,4 +6,7 @@
     <string name="no_flash">该设备不支持闪光灯</string>
     <string name="crop_fail">裁剪失败</string>
     <string name="open_permissions">请手动打开该应用需要的权限</string>
+    <string name="save">保存</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_failed">保存失败</string>
 </resources>

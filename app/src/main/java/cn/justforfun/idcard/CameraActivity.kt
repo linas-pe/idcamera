@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
+import androidx.core.os.EnvironmentCompat
 import cn.justforfun.utils.*
 import cn.justforfun.views.CameraPreview
 import cn.justforfun.views.CropImageView
@@ -78,11 +79,9 @@ class CameraActivity : Activity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
     private fun init() {
         setContentView(R.layout.activity_camera)
         _type = intent.getIntExtra(IDCardCamera.TAKE_TYPE, 0)
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         initView()
         initListener()
     }
@@ -225,24 +224,12 @@ class CameraActivity : Activity(), View.OnClickListener {
                     finish()
                 }
 
-                val rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)!!.absolutePath + File.separator + Constant.BASE_DIR
-                Log.e("DEBUG", rootDir)
-                if (FileUtils.createOrExistsDir(rootDir)) {
-                    Log.e("DEBUG", "success")
-                    val buffer = StringBuffer()
-                    var imagePath = ""
-                    if (_type == IDCardCamera.TYPE_IDCARD_FRONT) {
-                        imagePath = buffer.append(rootDir).append("idCardFrontCrop.jpg").toString()
-                    } else if (_type == IDCardCamera.TYPE_IDCARD_BACK) {
-                        imagePath = buffer.append(rootDir).append("idCardBackCrop.jpg").toString()
-                    }
-
-                    if (ImageUtils.save(bitmap!!, imagePath, Bitmap.CompressFormat.JPEG)) {
-                        val intent = Intent()
-                        intent.putExtra(IDCardCamera.IMAGE_PATH, imagePath)
-                        setResult(IDCardCamera.RESULT_CODE, intent)
-                        finish()
-                    }
+                val imageName = IDCardCamera.getImageName(_type)
+                if (ImageUtils.saveTemp(applicationContext, bitmap!!, imageName)) {
+                    val intent = Intent()
+                    intent.putExtra(IDCardCamera.IMAGE_NAME, imageName)
+                    setResult(IDCardCamera.RESULT_CODE, intent)
+                    finish()
                 }
             }
         }, true)

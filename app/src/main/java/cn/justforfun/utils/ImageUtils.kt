@@ -1,23 +1,21 @@
 package cn.justforfun.utils
 
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.*
+import android.os.Environment
+import android.provider.MediaStore
 import java.io.*
 
 class ImageUtils {
     companion object {
-        fun save(src: Bitmap, filePath: String, format: Bitmap.CompressFormat): Boolean {
-            return save(src, FileUtils.getFileByPath(filePath), format, false)
-        }
+        private val RELATIVE_PATH = File.separator + "MeiTeng" + File.separator + "IDCard"
+        private val LAST_IMAGE_DIR = Environment.DIRECTORY_DCIM + RELATIVE_PATH
+        private val IMG_FORMAT = Bitmap.CompressFormat.JPEG
 
-        fun save(src: Bitmap, file: File, format: Bitmap.CompressFormat): Boolean {
-            return save(src, file, format, false)
-        }
-
-        fun save(src: Bitmap, filePath: String, format: Bitmap.CompressFormat, recycle: Boolean): Boolean {
-            return save(src, FileUtils.getFileByPath(filePath), format, recycle)
-        }
-
-        fun save(src: Bitmap, file: File?, format: Bitmap.CompressFormat, recycle: Boolean): Boolean {
+        fun saveTemp(context: Context, src: Bitmap, name: String): Boolean {
+            val path = context.getExternalFilesDir(Environment.DIRECTORY_DCIM)!!.absolutePath + RELATIVE_PATH
+            val file = File(path, name)
             if (isEmptyBitmap(src) || !FileUtils.createOrExistsFile(file)) {
                 return false
             }
@@ -25,17 +23,55 @@ class ImageUtils {
             var os: OutputStream? = null
             var ret = false
             try {
-                os = BufferedOutputStream(FileOutputStream(file!!))
-                ret = src.compress(format, 100, os)
-                if (recycle && !src.isRecycled) {
-                    src.recycle()
-                }
+                os = BufferedOutputStream(FileOutputStream(file))
+                ret = src.compress(IMG_FORMAT, 100, os)
             } catch (e: IOException) {
                 e.printStackTrace()
             } finally {
                 FileUtils.closeIO(os)
             }
             return ret
+        }
+
+        fun openTemp(context: Context, name: String): Bitmap? {
+            val path = context.getExternalFilesDir(Environment.DIRECTORY_DCIM)!!.absolutePath + RELATIVE_PATH
+            val file = File(path, name)
+            if (!file.exists()) {
+                return null
+            }
+            return BitmapFactory.decodeFile(file.absolutePath)
+        }
+
+        fun save(context: Context, src: Bitmap, name: String): Boolean {
+            if (isEmptyBitmap(src)) {
+                return false
+            }
+            val resolver = context.contentResolver
+            val contentValue = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, LAST_IMAGE_DIR)
+            }
+
+            var ret = false
+            val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValue)
+                ?: return false
+            try {
+                resolver.openOutputStream(uri).use {
+                    try {
+                        ret = src.compress(IMG_FORMAT, 100, it)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+            } catch (e: FileNotFoundException) {
+                e.printStackTrace()
+            }
+            return ret
+        }
+
+        fun mergeImages(context: Context): Bitmap? {
+            return null
         }
 
         private fun isEmptyBitmap(src: Bitmap?): Boolean {
