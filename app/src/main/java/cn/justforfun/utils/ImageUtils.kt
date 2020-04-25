@@ -19,7 +19,6 @@ class ImageUtils {
             if (isEmptyBitmap(src) || !FileUtils.createOrExistsFile(file)) {
                 return false
             }
-            println(src.width.toString() + ", " + src.height)
             var os: OutputStream? = null
             var ret = false
             try {

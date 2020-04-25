@@ -6,7 +6,7 @@ import java.io.IOException
 
 class FileUtils {
     companion object {
-        fun createOrExistsDir(file: File?): Boolean {
+        private fun createOrExistsDir(file: File?): Boolean {
             if (file == null) {
                 return false
             }
@@ -19,10 +19,6 @@ class FileUtils {
                 e.printStackTrace()
                 false
             }
-        }
-
-        fun createOrExistsFile(filePath: String): Boolean {
-            return createOrExistsFile(getFileByPath(filePath))
         }
 
         fun createOrExistsFile(file: File?): Boolean {
@@ -41,22 +37,6 @@ class FileUtils {
                 e.printStackTrace()
                 return false
             }
-        }
-
-        private fun getFileByPath(filePath: String): File? {
-            return if (isSpace(filePath)) null else File(filePath)
-        }
-
-        private fun isSpace(s: String?): Boolean {
-            if (s == null) {
-                return true
-            }
-            for (c in s) {
-                if (!Character.isWhitespace(c)) {
-                    return false
-                }
-            }
-            return true
         }
 
         fun closeIO(vararg closeables: Closeable?) {
