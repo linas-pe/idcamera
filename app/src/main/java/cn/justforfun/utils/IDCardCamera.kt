@@ -18,6 +18,8 @@ class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?)
         const val PERMISSION_CODE_FIRST = 0x12
         const val TAKE_TYPE = "take_type"
         const val IMAGE_NAME = "image_name"
+        const val IMAGE_NAME_BACK = "temp_idcard_back.jpg"
+        const val IMAGE_NAME_FRONT = "temp_idcard_front.jpg"
 
         fun create(activity: Activity): IDCardCamera {
             return IDCardCamera(activity)
@@ -25,8 +27,8 @@ class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?)
 
         fun getImageName(type: Int): String {
             when (type) {
-                TYPE_IDCARD_BACK -> return "temp_idcard_back.jpg"
-                TYPE_IDCARD_FRONT -> return "temp_idcard_back.jpg"
+                TYPE_IDCARD_BACK -> return IMAGE_NAME_BACK
+                TYPE_IDCARD_FRONT -> return IMAGE_NAME_FRONT
             }
             throw RuntimeException("unknown type")
         }

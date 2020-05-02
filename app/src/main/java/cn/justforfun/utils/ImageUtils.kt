@@ -6,16 +6,24 @@ import android.graphics.*
 import android.os.Environment
 import android.provider.MediaStore
 import java.io.*
+import java.nio.file.Paths
 
 class ImageUtils {
     companion object {
-        private val RELATIVE_PATH = File.separator + "MeiTeng" + File.separator + "IDCard"
-        private val LAST_IMAGE_DIR = Environment.DIRECTORY_DCIM + RELATIVE_PATH
+        private val RELATIVE_PATH = Paths.get("MeiTeng", "IDCard").toString()
+        private val LAST_IMAGE_DIR = Paths.get(Environment.DIRECTORY_DCIM, RELATIVE_PATH).toString()
         private val IMG_FORMAT = Bitmap.CompressFormat.JPEG
 
+        private val IDCARD_WIDTH = 1000
+        private val IDCARD_HEIGHT = 600
+
+        private fun imagePath(context: Context): String {
+            val root = context.getExternalFilesDir(Environment.DIRECTORY_DCIM)!!.absolutePath
+            return  Paths.get(root, RELATIVE_PATH).toString()
+        }
+
         fun saveTemp(context: Context, src: Bitmap, name: String): Boolean {
-            val path = context.getExternalFilesDir(Environment.DIRECTORY_DCIM)!!.absolutePath + RELATIVE_PATH
-            val file = File(path, name)
+            val file = File(imagePath(context), name)
             if (isEmptyBitmap(src) || !FileUtils.createOrExistsFile(file)) {
                 return false
             }
@@ -33,8 +41,7 @@ class ImageUtils {
         }
 
         fun openTemp(context: Context, name: String): Bitmap? {
-            val path = context.getExternalFilesDir(Environment.DIRECTORY_DCIM)!!.absolutePath + RELATIVE_PATH
-            val file = File(path, name)
+            val file = File(imagePath(context), name)
             if (!file.exists()) {
                 return null
             }
@@ -69,8 +76,29 @@ class ImageUtils {
             return ret
         }
 
-        fun mergeImages(context: Context): Bitmap? {
-            return null
+        private fun scaleImage(src: Bitmap): Bitmap {
+            return Bitmap.createScaledBitmap(src, IDCARD_WIDTH, IDCARD_HEIGHT, false)
+        }
+
+        fun mergeImages(context: Context, frontName: String, backName: String): Bitmap? {
+            val frontImg = openTemp(context, frontName) ?: return null
+            val backImg = openTemp(context, backName) ?: return null
+
+            val scaleFrontImg = scaleImage(frontImg)
+            val scaleBackImg = scaleImage(backImg)
+
+            val dist = Bitmap.createBitmap(2480, 3508, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(dist)
+
+            val topRect = Rect(0, 0, IDCARD_WIDTH, IDCARD_HEIGHT)
+            val frontRect = Rect(740, 577, IDCARD_WIDTH + 740, IDCARD_HEIGHT + 577)
+            val backRectT = Rect(740, 2331, IDCARD_WIDTH + 740, IDCARD_HEIGHT + 2331)
+
+            canvas.drawColor(Color.WHITE)
+            canvas.drawBitmap(scaleFrontImg, topRect, frontRect, null)
+            canvas.drawBitmap(scaleBackImg, topRect, backRectT, null)
+
+            return dist
         }
 
         private fun isEmptyBitmap(src: Bitmap?): Boolean {
@@ -81,7 +109,7 @@ class ImageUtils {
             val image = YuvImage(bytes, ImageFormat.NV21, width, height, null)
             val os = ByteArrayOutputStream(bytes.size)
             if (!image.compressToJpeg(Rect(0,0, width, height), 100, os)) {
-                return null;
+                return null
             }
             val tmp = os.toByteArray()
             return BitmapFactory.decodeByteArray(tmp, 0, tmp.size)

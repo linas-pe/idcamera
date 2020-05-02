@@ -2,13 +2,13 @@ package cn.justforfun.idcard
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import cn.justforfun.utils.IDCardCamera
 import cn.justforfun.utils.ImageUtils
+import android.view.View
 
 class MainActivity : AppCompatActivity() {
     private var _ivFront: ImageView? = null
@@ -27,19 +27,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun front(view: View) {
-        IDCardCamera.create(this).openCamera(IDCardCamera.TYPE_IDCARD_FRONT)
+        IDCardCamera.create(this@MainActivity).openCamera(IDCardCamera.TYPE_IDCARD_FRONT)
     }
 
     fun back(view: View) {
-        IDCardCamera.create(this).openCamera(IDCardCamera.TYPE_IDCARD_BACK)
+        IDCardCamera.create(this@MainActivity).openCamera(IDCardCamera.TYPE_IDCARD_BACK)
     }
 
     fun save(view: View) {
-        val name = ""
-        val mergeImages = ImageUtils.mergeImages(this) ?: return
-        val msg = if (ImageUtils.save(this, mergeImages, name))
+        val name = "test"
+        val mergeImages = ImageUtils.mergeImages(
+            this@MainActivity,
+            IDCardCamera.IMAGE_NAME_FRONT, IDCardCamera.IMAGE_NAME_BACK) ?: return
+        val msg = if (ImageUtils.save(this@MainActivity, mergeImages, name))
             R.string.save_success else  R.string.save_failed
-        Toast.makeText(this, getString(msg), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this@MainActivity, getString(msg), Toast.LENGTH_SHORT).show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
