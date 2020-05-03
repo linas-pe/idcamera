@@ -3,6 +3,7 @@ package cn.justforfun.utils
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.*
+import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import java.io.*
@@ -46,6 +47,10 @@ class ImageUtils {
                 return null
             }
             return BitmapFactory.decodeFile(file.absolutePath)
+        }
+
+        fun openURI(context: Context, uri: Uri): Bitmap {
+            return BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri))
         }
 
         fun save(context: Context, src: Bitmap, name: String): Boolean {

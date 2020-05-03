@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/color_000000">
@@ -30,7 +31,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:background="@color/preview_mock" />
+                android:background="@color/preview_mock"
+                tools:ignore="NestedWeights" />
 
             <LinearLayout
                 android:id="@+id/ll_camera_crop_container"
@@ -70,7 +72,7 @@
                     android:gravity="center"
                     android:text="@string/touch_to_focus"
                     android:textColor="@color/color_afff"
-                    android:textSize="16dp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -82,6 +84,17 @@
             android:layout_width="136dp"
             android:layout_height="match_parent"
             android:background="@color/preview_mock">
+
+            <Button
+                android:id="@+id/btn_dcim"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textColor="@color/color_afff"
+                android:textSize="26sp"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="@string/dcim" />
 
             <!--拍照前操作布局-->
             <LinearLayout

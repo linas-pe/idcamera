@@ -15,6 +15,7 @@ class IDCardCamera private constructor(activity: Activity?, fragment: Fragment?)
         const val TYPE_IDCARD_FRONT = 1
         const val TYPE_IDCARD_BACK = 2
         const val RESULT_CODE = 0X11
+        const val CHOOSE_CODE = 0X12
         const val PERMISSION_CODE_FIRST = 0x12
         const val TAKE_TYPE = "take_type"
         const val IMAGE_NAME = "image_name"

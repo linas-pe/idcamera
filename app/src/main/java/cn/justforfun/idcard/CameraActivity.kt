@@ -1,26 +1,21 @@
 package cn.justforfun.idcard
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.Environment
 import android.os.Handler
-import android.util.Log
+import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.app.ActivityCompat
-import androidx.core.os.EnvironmentCompat
 import cn.justforfun.utils.*
 import cn.justforfun.views.CameraPreview
 import cn.justforfun.views.CropImageView
 import cn.justforfun.views.CropListener
-import java.io.File
 
 class CameraActivity : Activity(), View.OnClickListener {
     private var _cropImageView: CropImageView? = null
@@ -128,6 +123,7 @@ class CameraActivity : Activity(), View.OnClickListener {
         findViewById<ImageView>(R.id.iv_camera_take).setOnClickListener(this)
         findViewById<ImageView>(R.id.iv_camera_result_ok).setOnClickListener(this)
         findViewById<ImageView>(R.id.iv_camera_result_cancel).setOnClickListener(this)
+        findViewById<Button>(R.id.btn_dcim).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -155,7 +151,14 @@ class CameraActivity : Activity(), View.OnClickListener {
                 _ivCameraFlash!!.setImageResource(R.mipmap.camera_flash_off)
                 setTakePhotoLayout()
             }
+            R.id.btn_dcim -> chosePhoto()
         }
+    }
+
+    private fun chosePhoto() {
+        val intentToPickPic = Intent(Intent.ACTION_PICK, null)
+        intentToPickPic.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+        startActivityForResult(intentToPickPic, IDCardCamera.CHOOSE_CODE)
     }
 
     private fun takePhoto() {
@@ -243,5 +246,13 @@ class CameraActivity : Activity(), View.OnClickListener {
     override fun onStop() {
         super.onStop()
         _cameraPreview?.onStop()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        if (requestCode == IDCardCamera.CHOOSE_CODE && data.data != null) {
+            val bitmap = ImageUtils.openURI(this, data.data!!)
+            cropImage(bitmap)
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
